@@ -38,14 +38,14 @@ function CSVUploader({ onEmailsParsed }) {
 
   return (
     <div className="mt-6 border-t pt-4">
-      <label className="block font-medium text-gray-700 mb-2">
+      <label className="block font-medium text-gray-700 mb-2 text-xl">
         Upload CSV File
       </label>
       <input
         type="file"
         accept=".csv"
         onChange={handleFileChange}
-        className="mb-4 color-sky-blue"
+        className="mb-4 color-sky-blue text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#24A0ED] file:text-white hover:file:bg-[#1a7bbf] cursor-pointer"
       />
 
       {csvData.length > 0 && (

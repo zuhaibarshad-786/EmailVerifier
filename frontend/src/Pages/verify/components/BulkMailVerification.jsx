@@ -6,6 +6,7 @@ function BulKMailVerification() {
   const bulkMails = useRef("");
   const [results, setResults] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false); // Spinner state
 
   const handleBulkVerify = async (emailsFromCSV = null) => {
     let emailList = [];
@@ -25,13 +26,20 @@ function BulKMailVerification() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/validate-email/bulk", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ emails: emailList }),
-      });
+      setLoading(true); // Start loading
+      setResults([]);
+      setSummary(null);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/validate-email/bulk",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ emails: emailList }),
+        }
+      );
 
       const data = await response.json();
 
@@ -50,6 +58,8 @@ function BulKMailVerification() {
     } catch (error) {
       console.error("Bulk verification failed:", error);
       toast.error("Error verifying emails.");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -68,60 +78,100 @@ function BulKMailVerification() {
       ></textarea>
 
       <button
-        className="mt-4 py-3 px-5 text-white bg-[#24A0ED] hover:opacity-70 rounded"
+        className="mt-4 py-3 px-5 text-white bg-[#24A0ED] hover:opacity-70 rounded disabled:opacity-60"
         onClick={() => handleBulkVerify()}
+        disabled={loading}
       >
-        Verify
+        {loading ? "Verifying..." : "Verify"}
       </button>
 
-      {/* ✅ Add CSVUploader component */}
+      {/*Add CSVUploader component */}
       <CSVUploader onEmailsParsed={(emails) => handleBulkVerify(emails)} />
 
-      {summary && (
-        <div className="mt-6 text-sm text-gray-700">
-          <p><strong>Total Emails:</strong> {summary.total}</p>
-          <p><strong>Processing Time (sec):</strong> {summary.time}</p>
-          <p><strong>Average Time/Email (sec):</strong> {summary.avg}</p>
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="flex justify-center items-center py-6">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       )}
 
-      {results.length > 0 && (
+      {summary && !loading && (
+        <div className="mt-6 text-sm text-gray-700">
+          <p>
+            <strong>Total Emails:</strong> {summary.total}
+          </p>
+          <p>
+            <strong>Processing Time (sec):</strong> {summary.time}
+          </p>
+          <p>
+            <strong>Average Time/Email (sec):</strong> {summary.avg}
+          </p>
+        </div>
+      )}
+
+      {results.length > 0 && !loading && (
         <div className="mt-8 overflow-x-auto">
-          <h4 className="text-xl font-semibold mb-3">Verification Results:</h4>
-          <table className="min-w-full border text-sm text-left text-gray-700">
-            <thead className="bg-gray-100 text-gray-700 uppercase">
+          <h4 className="text-2xl font-semibold mb-4 text-[#222]">
+            Verification Results:
+          </h4>
+          <table className="min-w-full text-sm text-left rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <thead className="bg-[#f5f8fa] text-gray-600 uppercase text-xs tracking-wider">
               <tr>
-                <th className="px-4 py-2 border">Email</th>
-                <th className="px-4 py-2 border">Status</th>
-                <th className="px-4 py-2 border">Sub-Status</th>
-                <th className="px-4 py-2 border">Free Email</th>
-                <th className="px-4 py-2 border">Disposable</th>
-                <th className="px-4 py-2 border">Account</th>
-                <th className="px-4 py-2 border">Domain</th>
-                <th className="px-4 py-2 border">Domain Age</th>
-                <th className="px-4 py-2 border">SMTP Provider</th>
-                <th className="px-4 py-2 border">MX Found</th>
-                <th className="px-4 py-2 border">MX Record</th>
-                <th className="px-4 py-2 border">Catch All</th>
-                <th className="px-4 py-2 border">Blacklisted</th>
+                {[
+                  "Email",
+                  "Status",
+                  "Sub-Status",
+                  "Free Email",
+                  "Disposable",
+                  "Account",
+                  "Domain",
+                  "Domain Age",
+                  "SMTP Provider",
+                  "MX Found",
+                  "MX Record",
+                  "Catch All",
+                  "Blacklisted",
+                ].map((heading) => (
+                  <th
+                    key={heading}
+                    className="px-4 py-3 border-b border-gray-200 whitespace-nowrap"
+                  >
+                    {heading}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-white text-gray-800">
               {results.map((res, index) => (
-                <tr key={index} className="bg-white">
-                  <td className="px-4 py-2 border">{res.email}</td>
-                  <td className="px-4 py-2 border">{res.status}</td>
-                  <td className="px-4 py-2 border">{res.sub_status}</td>
-                  <td className="px-4 py-2 border">{res.free_email ? "Yes" : "No"}</td>
-                  <td className="px-4 py-2 border">{res.disposable_email ? "Yes" : "No"}</td>
-                  <td className="px-4 py-2 border">{res.account}</td>
-                  <td className="px-4 py-2 border">{res.domain}</td>
-                  <td className="px-4 py-2 border">{res.domain_age_days}</td>
-                  <td className="px-4 py-2 border">{res.smtp_provider}</td>
-                  <td className="px-4 py-2 border">{res.mx_found ? "Yes" : "No"}</td>
-                  <td className="px-4 py-2 border">{res.mx_record}</td>
-                  <td className="px-4 py-2 border">{res.is_catch_all ? "Yes" : "No"}</td>
-                  <td className="px-4 py-2 border">{res.blacklisted ? "Yes" : "No"}</td>
+                <tr
+                  key={index}
+                  className={`${
+                    index % 2 === 0 ? "bg-white" : "bg-[#f9fbfd]"
+                  } hover:bg-blue-50 transition-colors`}
+                >
+                  <td className="px-4 py-2 border-b">{res.email}</td>
+                  <td className="px-4 py-2 border-b">{res.status}</td>
+                  <td className="px-4 py-2 border-b">{res.sub_status}</td>
+                  <td className="px-4 py-2 border-b">
+                    {res.free_email ? "Yes" : "No"}
+                  </td>
+                  <td className="px-4 py-2 border-b">
+                    {res.disposable_email ? "Yes" : "No"}
+                  </td>
+                  <td className="px-4 py-2 border-b">{res.account}</td>
+                  <td className="px-4 py-2 border-b">{res.domain}</td>
+                  <td className="px-4 py-2 border-b">{res.domain_age_days}</td>
+                  <td className="px-4 py-2 border-b">{res.smtp_provider}</td>
+                  <td className="px-4 py-2 border-b">
+                    {res.mx_found ? "Yes" : "No"}
+                  </td>
+                  <td className="px-4 py-2 border-b">{res.mx_record}</td>
+                  <td className="px-4 py-2 border-b">
+                    {res.is_catch_all ? "Yes" : "No"}
+                  </td>
+                  <td className="px-4 py-2 border-b">
+                    {res.blacklisted ? "Yes" : "No"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -131,5 +181,4 @@ function BulKMailVerification() {
     </div>
   );
 }
-
 export default BulKMailVerification;

@@ -20,7 +20,6 @@ function Verify() {
       ) : (
         <BulKMailVerification />
       )}
-
       {showResult ? <Result /> : null}
 
       <Footer />

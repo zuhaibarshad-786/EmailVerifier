@@ -1,23 +1,47 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
+import Papa from "papaparse";
 
-function BulKMailVerification() {
-  const bulkMails = useRef("");
+function CSVEmailVerifier() {
+  const [emails, setEmails] = useState([]);
   const [results, setResults] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [selectedColumn, setSelectedColumn] = useState("");
+  const [columns, setColumns] = useState([]);
+  const [csvData, setCsvData] = useState([]);
 
-  const handleBulkVerify = async () => {
-    const input = bulkMails.current.value.trim();
+  const handleCSVUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    if (!input) {
-      toast.error("Please enter emails.");
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const data = results.data;
+        const columnNames = Object.keys(data[0]);
+        setColumns(columnNames);
+        setCsvData(data);
+        toast.success("CSV uploaded. Now select a column containing emails.");
+      },
+      error: () => toast.error("Failed to parse CSV."),
+    });
+  };
+
+  const handleVerify = async () => {
+    if (!selectedColumn) {
+      toast.error("Please select a column first.");
       return;
     }
 
-    const emailList = input
-      .split("\n")
-      .map((email) => email.trim())
-      .filter((email) => email.length > 0);
+    const extractedEmails = csvData
+      .map((row) => row[selectedColumn]?.trim())
+      .filter((email) => email?.length > 0);
+
+    if (extractedEmails.length === 0) {
+      toast.error("No emails found in selected column.");
+      return;
+    }
 
     try {
       const response = await fetch("http://127.0.0.1:8000/validate-email/bulk", {
@@ -25,7 +49,7 @@ function BulKMailVerification() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ emails: emailList }),
+        body: JSON.stringify({ emails: extractedEmails }),
       });
 
       const data = await response.json();
@@ -40,8 +64,6 @@ function BulKMailVerification() {
       } else {
         toast.error("Unexpected response format.");
       }
-
-      bulkMails.current.value = "";
     } catch (error) {
       console.error("Bulk verification failed:", error);
       toast.error("Error verifying emails.");
@@ -49,28 +71,42 @@ function BulKMailVerification() {
   };
 
   return (
-    <div className="mb-5 p-5 flex flex-col justify-center w-[60%] mx-auto rounded-[8px] shadow-xl border border-[rgb(157,165,176)] max-sm:w-[95%] max-md:w-[95%] animate-fade-in-down">
-      <h3 className="font-[600] text-3xl">Bulk Email Verification</h3>
-      <p className="text-[20px] text-[rgb(157,165,176)]">
-        Enter multiple email addresses (one per line)
-      </p>
+    <div className="p-5 max-w-4xl mx-auto">
+      <h3 className="text-3xl font-semibold mb-2">CSV Email Verification</h3>
 
-      <textarea
-        className="bulkMail w-full mt-3 p-2 border rounded"
-        rows={6}
-        placeholder={`user1@gmail.com\nuser2@gmail.com\nuser3@gmail.com`}
-        ref={bulkMails}
-      ></textarea>
+      <input
+        type="file"
+        accept=".csv"
+        className="mb-4"
+        onChange={handleCSVUpload}
+      />
+
+      {columns.length > 0 && (
+        <div className="mb-4">
+          <label className="mr-2">Select Email Column:</label>
+          <select
+            className="p-2 border rounded"
+            onChange={(e) => setSelectedColumn(e.target.value)}
+          >
+            <option value="">--Select--</option>
+            {columns.map((col, idx) => (
+              <option key={idx} value={col}>
+                {col}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <button
-        className="mt-4 py-3 px-5 text-white bg-[#24A0ED] hover:opacity-70 rounded"
-        onClick={handleBulkVerify}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:opacity-80"
+        onClick={handleVerify}
       >
-        Verify
+        Verify Emails
       </button>
 
       {summary && (
-        <div className="mt-6 text-sm text-gray-700">
+        <div className="mt-5 text-sm">
           <p><strong>Total Emails:</strong> {summary.total}</p>
           <p><strong>Processing Time (sec):</strong> {summary.time}</p>
           <p><strong>Average Time/Email (sec):</strong> {summary.avg}</p>
@@ -78,10 +114,10 @@ function BulKMailVerification() {
       )}
 
       {results.length > 0 && (
-        <div className="mt-8 overflow-x-auto">
-          <h4 className="text-xl font-semibold mb-3">Verification Results:</h4>
-          <table className="min-w-full border text-sm text-left text-gray-700">
-            <thead className="bg-gray-100 text-gray-700 uppercase">
+        <div className="mt-5 overflow-x-auto">
+          <h4 className="text-xl font-semibold mb-3">Verification Results</h4>
+          <table className="min-w-full border text-sm text-left">
+            <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-2 border">Email</th>
                 <th className="px-4 py-2 border">Status</th>
@@ -124,4 +160,4 @@ function BulKMailVerification() {
   );
 }
 
-export default BulKMailVerification;
+export default CSVEmailVerifier;

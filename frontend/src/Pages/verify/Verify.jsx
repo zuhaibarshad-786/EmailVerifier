@@ -26,5 +26,4 @@ function Verify() {
     </>
   );
 }
-
 export default Verify;

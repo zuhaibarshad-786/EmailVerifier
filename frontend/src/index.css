@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+  zoom: 80%;
+}
+@layer base {
+  button {
+    @apply cursor-pointer py-2 px-5 rounded-[8px] transition duration-500 font-bold transition duration-500 hover:scale-105;
+  }
+
+  input {
+    @apply px-5 py-2 border-2 border-gray-300 rounded-[8px] text-lg focus:outline-[rgb(75,95,199)] caret-[rgb(75,95,199)];
+  }
+
+  select {
+    @apply px-5 py-2 border-2 border-gray-300 rounded-[8px] text-lg focus:outline-[rgb(75,95,199)];
+  }
+
+  textarea {
+    @apply px-5 py-2 border-2 border-gray-300 rounded-[8px] text-lg focus:outline-[rgb(75,95,199)] caret-[rgb(75,95,199)];
+  }
+
+  * {
+    @apply selection:bg-gray-300 selection:text-[rgb(75,95,199)];
+  }
+
+  * {
+    font-family: "Poppins", sans-serif;
+  }
+}
+
+@layer utilities {
+  .logo {
+    @apply w-40 cursor-pointer max-sm:w-25 max-md:w-25 max-lg:w-25;
+  }
+
+  .custom-p {
+    @apply cursor-pointer text-[rgb(75,85,99)] text-lg transition duration-500 hover:text-[rgb(75,95,199)];
+  }
+
+  .custom-responsive-p {
+    @apply cursor-pointer text-white text-lg mb-2 transition duration-500 hover:text-[rgb(75,95,199)] hover:bg-gray-200 rounded-[8px]  p-2;
+  }
+
+  .custom-sidebar-button {
+    @apply font-bold text-[#24A0ED] hover:opacity-70;
+  }
+
+  .custom-footer-p {
+    @apply transition duration-500 hover:text-white cursor-pointer mt-3 text-lg;
+  }
+
+  .why-us-card-h3 {
+    @apply text-[25px] font-bold mt-5 text-center mb-2;
+  }
+
+  .why-us-card-icon {
+    @apply w-10 h-10 rounded-full border-1 p-2;
+  }
+
+  .why-us-card-outer-div {
+    @apply flex flex-col justify-center items-center py-4 px-10 shadow-xl rounded-[8px] transition duration-500 hover:scale-105;
+  }
+
+  .why-us-p {
+    @apply text-[20px] text-[rgb(157,165,176)] text-center;
+  }
+
+  .sign-in-label {
+    @apply font-bold my-2 text-lg;
+  }
+
+  .sign-up-span {
+    @apply cursor-pointer text-[rgb(75,95,199)] hover:opacity-70 hover:underline;
+  }
+
+  .sign-in-up-outer-div {
+    @apply flex flex-col justify-center items-center p-5 shadow-md rounded-[8px] mt-10 w-[40%] ml-auto mr-auto max-sm:w-[90%] max-md:w-[90%] max-lg:w-[90%];
+  }
+
+  .contact-info-side {
+    @apply flex flex-col p-10 rounded-[8px] shadow-lg w-100 transition duration-500 hover:scale-105 max-sm:w-[100%] max-md:w-[100%] max-lg:w-[100%] max-xl:w-[100%];
+  }
+
+  .demo {
+    @apply mt-2 sm:mt-0 px-3 py-1 text-sm transition duration-300 rounded-full cursor-text;
+  }
+
+  .demo-outer-div {
+    @apply flex flex-col sm:flex-row items-center justify-between p-3 border rounded-[8px];
+  }
+
+  .result-div {
+    @apply flex flex-col items-center justify-center py-4 border-1 rounded-[8px];
+  }
+
+  .result-count {
+    @apply text-[40px] font-bold;
+  }
+
+  .error {
+    @apply border-red-300;
+  }
+
+  .checkbox-error {
+    @apply outline outline-2  outline-red-300;
+  }
+
+  .error-msg-p{
+    @apply text-red-300 block;
+  }
+}

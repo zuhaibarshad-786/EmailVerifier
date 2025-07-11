@@ -1,4 +1,4 @@
-import { toggleButton } from "../JS/verifyMetaData";
+import { toggleButton } from "../JS/toggleButton";
 
 function VerifyHeader({ setVerifyMail }) {
   return (
@@ -15,10 +15,10 @@ function VerifyHeader({ setVerifyMail }) {
           className="verify-button w-[100%] bg-white"
           onClick={() => {
             toggleButton();
-            setVerifyMail("signleMail");
+            setVerifyMail("singleMail");
           }}
         >
-          Signle Email
+          Single Email
         </button>
         <button
           className="verify-button w-[100%]"

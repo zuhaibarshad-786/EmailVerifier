@@ -51,7 +51,7 @@ function SingleMailVerification() {
         </button>
       </div>
 
-      {/* ✅ Show response in table */}
+      {/*Show response in table */}
       {result && (
         <div className="mt-4">
           <h4 className="text-xl font-semibold mb-2">Verification Result:</h4>

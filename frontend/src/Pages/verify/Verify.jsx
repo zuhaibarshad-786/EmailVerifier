@@ -4,8 +4,6 @@ import Header from "../../Components/HeaderSimple/Header";
 import VerifyHeader from "./components/VerifyHeader";
 import SingleMailVerification from "./components/SingleMailVerification";
 import BulKMailVerification from "./components/BulkMailVerification";
-// import Result from "./components/Result";
-
 import Footer from "../../Components/FooterSimple/Footer";
 
 function Verify() {
